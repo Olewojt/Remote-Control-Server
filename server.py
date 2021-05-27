@@ -38,15 +38,10 @@ def command_handle(comm):
     print(CWD)
     try:
         if command[0]=="cd" and len(command)>=2:
-<<<<<<< HEAD
             tmp = command[1]
             for x in range(2, len(command), 1):
                 tmp = tmp+" "+command[x]
-            print(tmp)
             chdir(tmp)
-=======
-            chdir(command[1])
->>>>>>> 1cb254b2f40a6460015a28cdb46e71d0b30f9577
             CWD = getcwd()     
         p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, cwd=getcwd())
         if len(p.stdout)==0 and p.returncode!=0:
