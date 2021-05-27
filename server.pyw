@@ -1,9 +1,10 @@
 from os import pipe, getcwd, chdir
 import socket
 import subprocess
+import traceback
 
 BUFF_SIZE = 1024
-HOST = "192.168.1.15"
+HOST = socket.gethostbyname(socket.gethostname())
 PORT = 54545
 FORMAT = "utf-8"
 DISC_MSG = "!dc"
@@ -43,7 +44,7 @@ def command_handle(comm):
                 tmp = tmp+" "+command[x]
             chdir(tmp)
             CWD = getcwd()     
-        p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, cwd=getcwd())
+        p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, cwd=getcwd(), stdin=subprocess.DEVNULL, stderr = subprocess.STDOUT) #do not change nor remove any of the arguments
         if len(p.stdout)==0 and p.returncode!=0:
             conn.send(b"Something is wrong.")
             conn.send(bytes(CWD, FORMAT))
@@ -53,12 +54,16 @@ def command_handle(comm):
         else: 
             conn.send(b"\n"+p.stdout)
             conn.send(bytes(CWD, FORMAT))
-    except:
+    except Exception as e:
         #conn.send(bytes(Exception), FORMAT)
         print("Subprocess error. (Most probably)")
         conn.send(b"Subprocess Error")
+        with open("errors.txt", "w") as err:
+            traceback.print_exc(file = err)
 sock.listen()
 print(f"Listening on [{HOST}]")
-while True:
-    conn, addr = sock.accept()
-    handle_client(conn, addr)
+if __name__ == "__main__":
+    while True:
+        conn, addr = sock.accept()
+        conn.send(b"[Connected]")
+        handle_client(conn, addr)
