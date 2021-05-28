@@ -18,13 +18,13 @@ def recv_msg():
                 recv_msg = recv_msg.decode()
                 print(recv_msg)
         except (ConnectionResetError, ConnectionAbortedError):
-            print("\n Utracono polaczenie. Wpisz dowolny znak.")
+            print("\n Lost connection. Type anything to continue.")
             break
 
 def send_msg():
     while True:
         try:
-            send = input(f"[{HOST}]: ")
+            send = input()
         except KeyboardInterrupt:
             client.shutdown(socket.SHUT_RDWR)
             client.close()
@@ -71,13 +71,13 @@ while True:
 
             #Creating thread
             X = threading.Thread(target=recv_msg)
-            try:   #Prawdopodonie bezuzyteczne, jednak nie!
+            try:   #Crucial to error handling.
                 X.start()
                 send_msg()
             except (ConnectionAbortedError, ConnectionResetError):
-                print("Zerwano polaczenie!")
+                print("Lost connection!")
         except ConnectionRefusedError:
-            print("Odrzucono polaczenie [Serwer offline]?")
+            print("Connection refused [Server Offline]")
             time.sleep(2)
     elif comm == "3":
         quit()
